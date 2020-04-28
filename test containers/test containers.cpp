@@ -1,7 +1,10 @@
-﻿#include "pch.h"
-#include <iostream>
+﻿//#define ARDUINO
 
-//#define ARDUINO
+#ifndef ARDUINO
+#include "pch.h"
+#include <iostream>
+#endif
+
 
 #ifndef ARDUINO
 #include <Windows.h>
