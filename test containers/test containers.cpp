@@ -92,6 +92,33 @@ namespace simplestd {
 #endif
 		thread_func m_tfThreadFunc;
 	};
+
+	class _cout {
+	public:
+		explicit _cout() {
+#ifdef ARDUINO
+			Serial.begin(9600);
+#endif
+		}
+#ifdef ARDUINO
+		_cout& operator <<(const char *in) {
+			Serial.println(in);
+			return *this;
+		}
+#else
+		_cout& operator <<(const std::string &in) {
+			std::cout << in.c_str();
+			return *this;
+		}
+	};
+	_cout cout;
+	char* to_string(int in) {
+		char* buff = (char*)malloc(16);
+		sprintf(buff, "%d", in);
+		return buff;
+	}
+#endif
+	const char *endl = "\n";
 };
 
 namespace House {
@@ -130,7 +157,7 @@ int main()
 	}
 	vec.push_back(228);
 	for (int i = 0, len = vec.length(); i < len; i++) {
-		std::cout <<"["<<i<<"] = "<< vec[i] << std::endl;
+		simplestd::cout <<"["<<simplestd::to_string(i)<<"] = "<< simplestd::to_string(vec[i]) << simplestd::endl;
 	}
 	std::cin.get();
 	return 0;
