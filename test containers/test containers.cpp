@@ -48,15 +48,21 @@ namespace simplestd {
 		unsigned int m_uiLength;
 	};
 #ifdef ARDUINO
-	typedef void(*thread_func)();
+	#define THREAD_RETURN_VALUE void
+	#define THREAD_ARGVS
+	#define THREAD_ARGV_TYPES
+	#define THREAD_CALL_AGREEMENT
 #else
-	typedef DWORD(__stdcall* thread_func)(PVOID in);
+	#define THREAD_ARGVS PVOID in
+	#define THREAD_ARGV_TYPES PVOID
+	#define THREAD_RETURN_VALUE DWORD
+	#define THREAD_CALL_AGREEMENT __stdcall
 #endif
+	typedef THREAD_RETURN_VALUE(THREAD_CALL_AGREEMENT* thread_func)(THREAD_ARGV_TYPES);
 	class thread {
 	public:
-		explicit thread(thread_func _thread_func) {
-			m_tfThreadFunc = _thread_func;
-		}
+		explicit thread(thread_func _thread_func) : m_tfThreadFunc(_thread_func) {}
+		explicit thread() {}
 		void run() {
 #ifdef ARDUINO
 			m_BaseThread = new Thread();
@@ -75,6 +81,9 @@ namespace simplestd {
 			CloseHandle(m_BaseThread);
 #endif
 		}
+		void setThreadFunc(thread_func in) {
+			m_tfThreadFunc = in;
+		}
 	private:
 #ifdef ARDUINO
 		Thread m_BaseThread;
@@ -91,6 +100,7 @@ namespace House {
 	public:
 		MovementController(unsigned int pin) {
 			m_uiPin = pin;
+			//TODO: init pin mode here
 		}
 		void registerCallback(const callback& _callback) {
 			m_vCallbacks.push_back(_callback);
@@ -102,6 +112,9 @@ namespace House {
 				//TODO: dont forget to use this argument which movement sensor returns.
 				m_vCallbacks[i](nullptr);
 			}
+		}
+		void checkIsMove() {
+
 		}
 		simplestd::vector<callback> m_vCallbacks;
 		//TODO: Replace unsigned int usage to class Pin (obviously, make this class..).
